@@ -1,72 +1,61 @@
-
-db:
-    image: percona
-    restart: always
-    volumes:
-        - ./mysql:/var/lib/mysql
-    env_file: conf/mysql
-dbclient:
-    image: percona
-    command: bash
-    links:
-        - db
-
-redis:
-    image: redis
-    restart: always
-
-mailcatcher:
-    image: schickling/mailcatcher
-    restart: always
-
-blackfire:
-    image: blackfire/blackfire
-    restart: always
-    env_file:
-        - conf/blackfire
-
-blackfireclient:
-    image: blackfire/blackfire
-    command: blackfire version
-    net: host
-    env_file:
-        - conf/blackfire
-
-php5:
-    build: php5
-    restart: always
-    volumes:
-        - ./workspace:/data
-        - ${HOME}/.ssh/id_rsa:/data/.ssh/id_rsa:ro
-    links:
-        - db
-        - mailcatcher
-        - redis
-        - blackfire
-
-php7:
-    build: php7
-    restart: always
-    volumes:
-        - ./workspace:/data
-        - ${HOME}/.ssh/id_rsa:/data/.ssh/id_rsa:ro
-    links:
-        - db
-        - mailcatcher
-        - redis
-        - blackfire
-
-web:
-    build: nginx
-    restart: always
-    volumes:
-        - ./workspace:/data:ro
-    links:
-        - php5:fpm
-
-        - php5:fpm5
-        - php7:fpm7
-        - mailcatcher
-    ports:
-        - 80:80
-        - 443:433
+version: '2'
+services:
+    db:
+        image: mysql:5.7
+        ports:
+            - 3307:3306
+        volumes:
+            - ./mysql:/var/lib/mysql
+        restart: always
+        env_file: conf/mysql
+    pgsql:
+        image: postgres:9.6
+        ports:
+            - 5433:5432
+        volumes:
+            - ./pgsql:/var/lib/postgresql
+        restart: always
+        env_file: conf/pgsql
+    redis:
+        image: redis:3.0
+        restart: always
+        ports:
+            - 6379:6379
+    mailcatcher:
+        image: schickling/mailcatcher
+        restart: always
+    php5:
+        build: php5
+        restart: always
+        volumes:
+            - ./workspace:/data
+            - ${HOME}/.ssh/id_rsa:/data/.ssh/id_rsa:ro
+        links:
+            - pgsql
+            - db
+            - mailcatcher
+            - redis
+    php7:
+        build: php7
+        restart: always
+        volumes:
+            - ./workspace:/data
+            - ${HOME}/.ssh/id_rsa:/data/.ssh/id_rsa:ro
+        links:
+            - pgsql
+            - db
+            - mailcatcher
+            - redis
+    web:
+        build: nginx
+        restart: always
+        volumes:
+            - ./workspace:/data:ro
+        links:
+            - php5:fpm
+            - php5:fpm5
+            - php7:fpm7
+            - mailcatcher
+        ports:
+            - 80:80
+            - 443:433

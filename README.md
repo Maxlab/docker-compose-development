@@ -2,8 +2,7 @@
 Docker-compose development
 ===
 
-Quickly start of developing locally with Nginx, PHP, Blackfire, Percona, Mailcatcher and Redis.
-
+Quickly start of developing locally with Nginx, PHP, Mysql, Pgsql, Mailcatcher and Redis.
 No e-mail is send externally, everything is catched by mailcatcher.
 
 
@@ -12,14 +11,12 @@ Base images
 
 Currently the next images are used. Trying to rely on official images as much as possible.
 
-- blackfire -> blackfire/blackfire:latest
-- data -> busybox:latest
 - mailcatcher -> schickling/mailcatcher:latest
-- nginx -> nginx:latest
-- percona -> percona:latest
-- php7 -> php:7.0-fpm
-- php5 -> php:5.6-fpm
-- redis -> redis:latest
+- nginx -> nginx:1.10.1
+- mysql -> mysql:5.7
+- php7  -> neolao/php:7.0-fpm with xDebug
+- php5  -> neolao/php:5.6-fpm with xDebug
+- redis -> redis:3.0
 
 
 Installation
@@ -28,7 +25,7 @@ Installation
 - Install [docker](https://docs.docker.com/)
 - Install docker [compose](https://docs.docker.com/compose/install/) >1.3.1
 - Clone this project 
-  `git clone git@github.com:JeroenBoersma/docker-compose-development.git development`
+  `git clone git@github.com:Maxlab/docker-compose-development.git development`
 
 
 Before
@@ -37,17 +34,17 @@ Before
 Tested under Linux. For Windows/Mac, take a look at the docker beta(heard that good performances are met)
 Stop all other local Webservers running on port 80/443.
 
-Set-up your database credentials and Blackfire profile in the conf directory
+Set-up your database credentials in the conf directory (OPTIONAL)
 
-- conf/mysql (`MYSQL_ROOT_PASSWORD=something`)
-- conf/blackfire (from blackfire docs select **docker installation**, grab the exports section, paste it and remove export)
+- conf/mysql
+- conf/pgsql
 
 Start
 ---
 
 - Run `./bin/dev up` from the development directory
 - \*.dev > 127.0.0.1 (if you use boot2docker, use that ip)
-    - dnsmasq
+    - sudo apt-get update && sudo apt-get install dnsmasq
       add a file `/etc/dnsmasq.d/dev.conf` with `address=/.dev/127.0.0.1`
     - hosts
         - add `127.0.0.1 test.project.dev` to your hosts file `/etc/hosts`
@@ -98,10 +95,11 @@ For instance, if you must run a Magento cronjob.
 You can add these to your local cron.
 
 
-Magento storecode
+How to
 ---
 
-Being a Magento developer, you can extend your url by adding the storecode.
-http://magento.project.storecode.dev/ will translate to workspace/magento/project/htdocs 
-and will set the `MAGE_RUN_CODE` to storecode.
-
+- Configure local wildcard DNS server(for linux)
+    - Install Dnsmasq: sudo apt-get install dnsmasq
+    - Since Ubuntu's NetworkManager uses dnsmasq, and since that messes things up a little for us, open up /etc/NetworkManager/NetworkManager.conf and comment out (#) the line that reads dns=dnsmasq. Restart NetworkManager afterwards: sudo restart network-manager.
+    - Make sure Dnsmasq listens to local DNS queries by editing /etc/dnsmasq.conf, and adding the line listen-address=127.0.0.1.
+    - Create a new file in /etc/dnsmasq.d (eg. /etc/dnsmasq.d/dev.conf), and add the line address=/.dev/127.0.0.1 to have dnsmasq resolve requests for *.dev domains. Restart Dnsmasq: sudo /etc/init.d/dnsmasq restart.

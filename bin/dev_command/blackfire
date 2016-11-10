@@ -1,3 +1,0 @@
-
-DEV_SERVICE=blackfireclient;
-DEV_CMD="blackfire ${DEV_COMMAND_OPTIONS}";
