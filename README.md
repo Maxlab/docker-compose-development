@@ -102,3 +102,11 @@ How to
     - Make sure Dnsmasq listens to local DNS queries by editing /etc/dnsmasq.conf, and adding the line listen-address=127.0.0.1.
     - Create a new file in /etc/dnsmasq.d (eg. /etc/dnsmasq.d/dev.conf), and add the line address=/.dev/127.0.0.1 to have dnsmasq resolve requests for *.dev domains. Restart Dnsmasq: sudo /etc/init.d/dnsmasq restart.
     
+- xDebug + PhpStorm configuration
+    Watch this video https://youtu.be/RdmcGAAQGfI
+    -dinclude_path=./:/usr/local/lib/php:/root/.composer/vendor/phpunit
+
+
+
+
+
