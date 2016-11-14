@@ -1,5 +1,5 @@
 
-Docker-compose development
+Quickly start of developing locally (Docker-compose development) 
 ===
 
 Video presentation - https://youtu.be/owE3Et6PaQM
@@ -16,8 +16,8 @@ Currently the next images are used. Trying to rely on official images as much as
 - mailcatcher -> schickling/mailcatcher:latest
 - nginx -> nginx:1.10.1
 - mysql -> mysql:5.7
-- php7  -> neolao/php:7.0-fpm with xDebug
-- php5  -> neolao/php:5.6-fpm with xDebug
+- php7xdebug -> need for interpreter phpstorm and other
+- php7  -> need for container, includes gem, npm, bower, gulp, composer 
 - redis -> redis:3.0
 
 
@@ -55,7 +55,6 @@ Start
 - open http://customer.project.dev/ in your browser (if you do not have dnsmasq, you have to add your hosts file manually).
 - all outgoing mail is sent to http://mail.dev/
 
-Default behavior is PHP7 and http://customer.project*.php5.dev*/ will call same project in PHP5.
 
 Database
 ---
@@ -82,9 +81,6 @@ If you want run a console to run php commands.
 - `./bin/dev console` - PHP7
 - `./bin/dev php` - PHP7
 
-- `./bin/dev console5` - PHP5
-- `./bin/dev php5` - PHP5
-
 Cron
 ---
 
@@ -105,3 +101,4 @@ How to
     - Since Ubuntu's NetworkManager uses dnsmasq, and since that messes things up a little for us, open up /etc/NetworkManager/NetworkManager.conf and comment out (#) the line that reads dns=dnsmasq. Restart NetworkManager afterwards: sudo restart network-manager.
     - Make sure Dnsmasq listens to local DNS queries by editing /etc/dnsmasq.conf, and adding the line listen-address=127.0.0.1.
     - Create a new file in /etc/dnsmasq.d (eg. /etc/dnsmasq.d/dev.conf), and add the line address=/.dev/127.0.0.1 to have dnsmasq resolve requests for *.dev domains. Restart Dnsmasq: sudo /etc/init.d/dnsmasq restart.
+    

@@ -1,10 +1,12 @@
-FROM neolao/php:5.6-fpm
+FROM neolao/php:7.0-fpm
+
 MAINTAINER Stepanov Nikolai <nstepanovdev@gmail.com>
 
 ENV PHP_EXTRA_CONFIGURE_ARGS --enable-fpm --with-fpm-user=app --with-fpm-group=app
 
 RUN groupadd -g 1000 app && \
-    useradd -g 1000 -u 1000 -d /data -s /bin/bash app
+    useradd -g 1000 -u 1000 -d /data -s /bin/bash app && \
+    usermod -G app -a www-data 
 
 RUN apt-get update --fix-missing && apt-get install -y \
         libfreetype6-dev \
@@ -18,19 +20,15 @@ RUN apt-get update --fix-missing && apt-get install -y \
         libicu-dev \
         libxslt-dev \
         wget git vim ruby ruby-dev libcurl4-openssl-dev \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get clean \    
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN docker-php-ext-install mcrypt mysql mysqli pdo_mysql mbstring ftp soap zip opcache intl xsl \
-    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
-    && docker-php-ext-install gd
-
-# Install xdebug
+#XDEBUG
 RUN pecl install xdebug \
-    && rm -rf /tmp/pear
-
-# Enable debug extension
-RUN echo ";zend_extension=`ls /usr/local/lib/php/extensions/no-debug-non-zts-*/xdebug.so`" > /usr/local/etc/php/conf.d/xdebug.ini
-
+    && echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)\n" >> /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.remote_enable=1" >> /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.remote_autostart=1" >> /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.remote_connect_back=1" >> /usr/local/etc/php/conf.d/xdebug.ini \
 
 COPY etc/php-fpm.conf /usr/local/etc/
 COPY etc/php.ini /usr/local/etc/php/
@@ -38,4 +36,3 @@ RUN chmod ugo+rX -R /usr/local/etc/php
 
 WORKDIR /data
 CMD ["php-fpm"]
-

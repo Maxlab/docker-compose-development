@@ -24,19 +24,9 @@ services:
     mailcatcher:
         image: schickling/mailcatcher
         restart: always
-    php5:
-        build: php5
-        restart: always
-        volumes:
-            - ./workspace:/data
-            - ${HOME}/.ssh/id_rsa:/data/.ssh/id_rsa:ro
-        links:
-            - pgsql
-            - db
-            - mailcatcher
-            - redis
     php7:
-        build: php7
+        build: php7xdebug
+        image: maxlab/php7xdebug
         restart: always
         volumes:
             - ./workspace:/data
@@ -48,14 +38,20 @@ services:
             - redis
     web:
         build: nginx
+        image: maxlab/nginx
         restart: always
         volumes:
             - ./workspace:/data:ro
         links:
-            - php5:fpm
-            - php5:fpm5
             - php7:fpm7
             - mailcatcher
         ports:
             - 80:80
             - 443:433
+    php7console:
+        build: php7
+        image: maxlab/php7
+        volumes:
+            - ./workspace:/data
+            - ${HOME}/.ssh/id_rsa:/data/.ssh/id_rsa:ro
+
