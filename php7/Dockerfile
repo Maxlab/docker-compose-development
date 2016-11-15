@@ -4,13 +4,16 @@ MAINTAINER Stepanov Nikolai <nstepanovdev@gmail.com>
 
 ENV PHP_EXTRA_CONFIGURE_ARGS --enable-fpm --with-fpm-user=app --with-fpm-group=app
 
-RUN groupadd -r node && useradd -r -g node node
-RUN groupadd -g 1000 app && \
-    useradd -g 1000 -u 1000 -d /data -s /bin/bash app && \
-    usermod -G app -a www-data && \
-    usermod -G app -a node     
 
-RUN apt-get update --fix-missing && apt-get install -y \
+RUN usermod -u 1000 -d /data -s /bin/bash www-data
+
+RUN groupadd -r node && \
+    useradd -r -g node node && \
+    usermod -G www-data -a node
+#RUN mkdir /data && chmod -R 644 /data && find /data -type d -exec chmod 755 {} \;
+
+#RUN apt-get update --fix-missing && apt-get install -y \
+RUN apt-get update && apt-get install -y \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
         libmcrypt-dev \

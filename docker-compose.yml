@@ -40,8 +40,8 @@ services:
         build: nginx
         image: maxlab/nginx
         restart: always
-        volumes:
-            - ./workspace:/data:ro
+        volumes_from:
+            - php7
         links:
             - php7:fpm7
             - mailcatcher
@@ -51,7 +51,6 @@ services:
     php7console:
         build: php7
         image: maxlab/php7
-        volumes:
-            - ./workspace:/data
-            - ${HOME}/.ssh/id_rsa:/data/.ssh/id_rsa:ro
+        volumes_from:
+            - php7
 
